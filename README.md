@@ -5,6 +5,7 @@ A Claude Code plugin marketplace for business-system connectors.
 ```bash
 /plugin marketplace add phultquist/ai-connectors
 /plugin install sevenshifts@ai-connectors
+/plugin install sevenrooms@ai-connectors
 ```
 
 ## Plugins
@@ -12,6 +13,7 @@ A Claude Code plugin marketplace for business-system connectors.
 | Plugin | What it does |
 | --- | --- |
 | [`sevenshifts`](plugins/sevenshifts) | Read-only access to 7shifts scheduling, labor, sales, and payroll data |
+| [`sevenrooms`](plugins/sevenrooms) | Read-only access to SevenRooms reservations, covers, guests, and waitlist data |
 
 ## How it fits together
 

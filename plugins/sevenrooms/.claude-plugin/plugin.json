@@ -1,0 +1,11 @@
+{
+  "name": "sevenrooms",
+  "description": "Read-only access to SevenRooms reservations, covers, guests, and waitlist data for executive reporting.",
+  "version": "1.0.0",
+  "author": {
+    "name": "AI Connectors",
+    "email": "patrick@particle.ai"
+  },
+  "keywords": ["sevenrooms", "reservations", "covers", "restaurant", "guests"],
+  "mcpServers": "./.mcp.json"
+}

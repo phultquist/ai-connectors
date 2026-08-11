@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "sevenrooms": {
+      "type": "http",
+      "url": "${SEVENROOMS_MCP_URL:-https://sevenrooms-mcp.aiconnectors.workers.dev/mcp}",
+      "headers": {
+        "Authorization": "Bearer ${SEVENROOMS_CONNECTOR_KEY}"
+      }
+    }
+  }
+}

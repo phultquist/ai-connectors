@@ -1,0 +1,20 @@
+name = "sevenrooms-mcp"
+main = "src/worker.ts"
+compatibility_date = "2025-01-01"
+
+# hi@patrick.app's Account.
+account_id = "863f3256a4ab8ea02de89a06294348ea"
+
+[vars]
+SEVENROOMS_API_VERSION = "2_4"
+# SevenRooms accepts a bearer token or an X-API-Key depending on the key type;
+# "both" sends the same value in both headers so either works.
+SEVENROOMS_AUTH_STYLE = "both"
+
+[[kv_namespaces]]
+binding = "TENANTS"
+id = "6b0a99cf81584a8f8a7b7be4e3e29e57"
+
+# Secrets (npx wrangler secret put <NAME>):
+#   ADMIN_SECRET       required - protects /admin/tenants
+#   SEVENROOMS_TOKEN   optional - single-tenant deploy with no KV
