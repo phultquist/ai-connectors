@@ -1,0 +1,33 @@
+{
+  "name": "sevenshifts-mcp",
+  "version": "1.0.0",
+  "description": "MCP connector for the 7shifts scheduling and payroll API",
+  "type": "module",
+  "bin": {
+    "sevenshifts-mcp": "dist/stdio.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/stdio.js",
+    "serve": "node dist/http.js",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "worker:dev": "wrangler dev"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^3.95.0"
+  }
+}

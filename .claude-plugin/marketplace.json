@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "ai-connectors",
+  "description": "Business-system connectors for Claude, by AI Connectors.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "AI Connectors",
+    "email": "patrick@particle.ai"
+  },
+  "plugins": [
+    {
+      "name": "sevenshifts",
+      "source": "./plugins/sevenshifts",
+      "description": "Read-only access to 7shifts scheduling, labor, sales, and payroll data for executive reporting.",
+      "version": "1.0.0",
+      "author": {
+        "name": "AI Connectors",
+        "email": "patrick@particle.ai"
+      },
+      "category": "business",
+      "tags": ["7shifts", "scheduling", "payroll", "restaurant", "labor", "analytics"]
+    }
+  ]
+}

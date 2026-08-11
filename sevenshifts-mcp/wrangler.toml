@@ -1,0 +1,23 @@
+name = "sevenshifts-mcp"
+main = "src/worker.ts"
+compatibility_date = "2025-01-01"
+
+# Non-secret configuration. Secrets are never stored here.
+[vars]
+SEVENSHIFTS_API_VERSION = "2026-06-01"
+
+# Tenant store. Create it once with:
+#   npx wrangler kv namespace create TENANTS
+# then paste the printed id below.
+[[kv_namespaces]]
+binding = "TENANTS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Secrets (set with `npx wrangler secret put <NAME>`):
+#   ADMIN_SECRET        required - protects /admin/tenants
+#   SEVENSHIFTS_TOKEN   optional - only for a single-tenant deploy with no KV
+
+# Custom domain: add a route once the zone is on Cloudflare.
+# routes = [
+#   { pattern = "api.aiconnectors.ai/*", zone_name = "aiconnectors.ai" }
+# ]
