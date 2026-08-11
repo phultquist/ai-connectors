@@ -2,6 +2,10 @@ name = "sevenshifts-mcp"
 main = "src/worker.ts"
 compatibility_date = "2025-01-01"
 
+# hi@patrick.app's Account. Not a credential — it only selects which of your
+# accounts to deploy to, and wrangler needs it because you have more than one.
+account_id = "863f3256a4ab8ea02de89a06294348ea"
+
 # Non-secret configuration. Secrets are never stored here.
 [vars]
 SEVENSHIFTS_API_VERSION = "2026-06-01"
@@ -11,7 +15,7 @@ SEVENSHIFTS_API_VERSION = "2026-06-01"
 # then paste the printed id below.
 [[kv_namespaces]]
 binding = "TENANTS"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "ceed078f659b4df0ba154bc61a7abe5c"
 
 # Secrets (set with `npx wrangler secret put <NAME>`):
 #   ADMIN_SECRET        required - protects /admin/tenants

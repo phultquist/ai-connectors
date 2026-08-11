@@ -2,7 +2,7 @@
   "mcpServers": {
     "sevenshifts": {
       "type": "http",
-      "url": "${SEVENSHIFTS_MCP_URL:-https://api.aiconnectors.ai/mcp}",
+      "url": "${SEVENSHIFTS_MCP_URL:-https://sevenshifts-mcp.aiconnectors.workers.dev/mcp}",
       "headers": {
         "Authorization": "Bearer ${SEVENSHIFTS_CONNECTOR_KEY}"
       }
