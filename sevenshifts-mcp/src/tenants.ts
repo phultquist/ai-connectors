@@ -106,6 +106,22 @@ export class TenantStore {
     return record.disabled ? null : record;
   }
 
+  /**
+   * Resolves a tenant by id. Used by the OAuth layer, where the connector key
+   * was exchanged for a token and is no longer presented on each request.
+   * Returns null for unknown, revoked, or disabled tenants, so revoking a
+   * connector key also kills any OAuth tokens derived from it.
+   */
+  async getById(tenantId: string): Promise<TenantRecord | null> {
+    const pointer = await this.kv.get(TENANT_NS + tenantId);
+    if (!pointer) return null;
+    const { key_hash } = JSON.parse(pointer) as { key_hash: string };
+    const raw = await this.kv.get(HASH_NS + key_hash);
+    if (!raw) return null;
+    const record = JSON.parse(raw) as TenantRecord;
+    return record.disabled ? null : record;
+  }
+
   async list(): Promise<TenantSummary[]> {
     const { keys } = await this.kv.list({ prefix: TENANT_NS });
     const out: TenantSummary[] = [];

@@ -17,7 +17,17 @@
 import { SevenShiftsClient } from "./client.js";
 import type { Env } from "./config.js";
 import { CORS_HEADERS, handleHttp, SERVER_INFO } from "./mcp.js";
-import { TenantStore, timingSafeEqual, type KVLike } from "./tenants.js";
+import {
+  authorizationServerMetadata,
+  handleAuthorizeGet,
+  handleAuthorizePost,
+  handleRegister,
+  handleToken,
+  protectedResourceMetadata,
+  resolveAccessToken,
+  wwwAuthenticate,
+} from "./oauth.js";
+import { TenantStore, timingSafeEqual, type KVLike, type TenantRecord } from "./tenants.js";
 
 export interface WorkerEnv extends Env {
   /** KV namespace holding tenant records. Bound in wrangler.toml. */
@@ -64,6 +74,31 @@ export default {
     }
 
     if (path.startsWith("/admin")) return handleAdmin(request, env, path);
+
+    /* ---- OAuth (for Cowork / web / Desktop, which have no shell env) -- */
+    if (env.TENANTS) {
+      const kv = env.TENANTS;
+      // RFC 9728 allows the resource path to be appended to the well-known path.
+      if (path === "/.well-known/oauth-protected-resource" || path === "/.well-known/oauth-protected-resource/mcp") {
+        return json(protectedResourceMetadata(url.origin));
+      }
+      if (path === "/.well-known/oauth-authorization-server" || path === "/.well-known/oauth-authorization-server/mcp") {
+        return json(authorizationServerMetadata(url.origin));
+      }
+      // A malformed OAuth request must not surface as an opaque 500.
+      try {
+        if (path === "/register" && request.method === "POST") return await handleRegister(request, kv);
+        if (path === "/authorize" && request.method === "GET") return await handleAuthorizeGet(url, kv);
+        if (path === "/authorize" && request.method === "POST") return await handleAuthorizePost(request, kv);
+        if (path === "/token" && request.method === "POST") return await handleToken(request, kv);
+      } catch (err) {
+        return json(
+          { error: "server_error", error_description: (err as Error)?.message ?? "Unexpected error" },
+          400,
+        );
+      }
+    }
+
     if (path !== "/mcp") {
       return json({ error: "Not found. The MCP endpoint is at /mcp." }, 404);
     }
@@ -73,11 +108,29 @@ export default {
     let client: SevenShiftsClient;
 
     if (env.TENANTS) {
+      const authHeader = { "WWW-Authenticate": wwwAuthenticate(url.origin) };
       if (!presented) {
-        return unauthorized("Missing connector key. Send Authorization: Bearer ck_live_...");
+        return json(
+          { error: "Authentication required. Send a connector key or an OAuth access token." },
+          401,
+          authHeader,
+        );
       }
-      const tenant = await new TenantStore(env.TENANTS).lookup(presented);
-      if (!tenant) return unauthorized("Invalid or revoked connector key.");
+
+      // Two credentials, one tenant lookup: the connector key directly (Claude
+      // Code), or an OAuth access token exchanged for it (Cowork, web, Desktop).
+      let tenant: TenantRecord | null;
+      if (presented.startsWith("at_")) {
+        tenant = await resolveAccessToken(env.TENANTS, presented, `${url.origin}/mcp`);
+      } else {
+        tenant = await new TenantStore(env.TENANTS).lookup(presented);
+      }
+
+      if (!tenant) {
+        return json({ error: "Invalid, expired, or revoked credential." }, 401, {
+          "WWW-Authenticate": wwwAuthenticate(url.origin, "invalid_token"),
+        });
+      }
 
       client = new SevenShiftsClient({
         token: tenant.sevenshifts_token,

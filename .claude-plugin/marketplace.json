@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "ai-connectors",
   "description": "Business-system connectors for Claude, by AI Connectors.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "owner": {
     "name": "AI Connectors",
     "email": "patrick@particle.ai"
@@ -12,7 +12,7 @@
       "name": "sevenshifts",
       "source": "./plugins/sevenshifts",
       "description": "Read-only access to 7shifts scheduling, labor, sales, and payroll data for executive reporting.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "author": {
         "name": "AI Connectors",
         "email": "patrick@particle.ai"

@@ -10,30 +10,36 @@ so you can ask Claude questions like:
 
 ## Setup
 
-You'll be given a **connector key** that looks like `ck_live_…`.
+You'll be given a **connector key** that looks like `ck_live_…`. Setup differs
+slightly depending on where you use Claude.
 
-**1. Add the key to your environment**
+### Claude Cowork, claude.ai, or Claude Desktop
+
+Add it as a custom connector — you'll be asked for your key once, in a browser.
+
+1. **Settings → Connectors → Add custom connector**
+2. URL: `https://sevenshifts-mcp.aiconnectors.workers.dev/mcp`
+3. Click **Connect**. A page opens asking for your connector key — paste it and
+   submit. That's the only time you'll need it.
+
+### Claude Code
+
+Claude Code reads the key from your shell environment.
 
 ```bash
 echo 'export SEVENSHIFTS_CONNECTOR_KEY=ck_live_your_key_here' >> ~/.zshrc
 ```
 
-Then open a new terminal so it takes effect.
-
-**2. Install the plugin**
+Open a **new terminal**, then:
 
 ```
 /plugin marketplace add phultquist/ai-connectors
 /plugin install sevenshifts@ai-connectors
 ```
 
-**3. Check it worked**
+Check it with `/mcp` — `sevenshifts` should show as connected.
 
-```
-/mcp
-```
-
-`sevenshifts` should show as connected. Then just ask:
+### Then just ask
 
 > Use 7shifts to show me labor percentage by location for last week.
 
@@ -55,8 +61,12 @@ It is **read-only** — it cannot create, edit, or delete anything in 7shifts.
 
 ## Troubleshooting
 
-**`sevenshifts` doesn't appear in `/mcp`** — `SEVENSHIFTS_CONNECTOR_KEY` isn't
-set in the environment Claude Code was launched from. Check with
+**`sevenshifts` doesn't appear in `/mcp` (Claude Code)** — `SEVENSHIFTS_CONNECTOR_KEY`
+isn't set in the environment Claude Code was launched from. Check with
 `echo $SEVENSHIFTS_CONNECTOR_KEY`, then restart Claude Code from that terminal.
+
+**Connector won't connect (Cowork / web / Desktop)** — use the custom-connector
+flow above, not the plugin. The plugin reads a shell variable, which those
+clients don't have.
 
 **401 errors** — the key was revoked or rotated. Ask for a new one.

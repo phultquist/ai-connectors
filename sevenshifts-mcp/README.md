@@ -93,13 +93,45 @@ Get a customer's 7shifts key from **7shifts → Settings → Developer Tools →
 
 ## Auth model
 
+Two ways to authenticate, both resolving to the same tenant:
+
 | Route | Credential |
 | --- | --- |
-| `POST /mcp` | `Authorization: Bearer ck_live_…` (per-customer connector key) |
+| `POST /mcp` | `Authorization: Bearer ck_live_…` — the connector key directly (Claude Code) |
+| `POST /mcp` | `Authorization: Bearer at_…` — an OAuth access token (Cowork, web, Desktop) |
 | `/admin/*` | `Authorization: Bearer $ADMIN_SECRET` |
 
 Without a `TENANTS` KV binding the Worker falls back to single-tenant mode: one
 `SEVENSHIFTS_TOKEN` secret, optionally gated by `MCP_SHARED_SECRET`.
+
+### OAuth (Cowork, web, Desktop)
+
+Claude Code expands `${SEVENSHIFTS_CONNECTOR_KEY}` from the customer's shell.
+Cowork and the web app call the MCP endpoint from Anthropic's cloud, where there
+is no shell — so those clients need OAuth. The Worker is both the resource
+server and the authorization server, per the
+[MCP authorization spec](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization).
+
+| Endpoint | Purpose |
+| --- | --- |
+| `/.well-known/oauth-protected-resource` | RFC 9728 resource metadata |
+| `/.well-known/oauth-authorization-server` | RFC 8414 server metadata |
+| `POST /register` | RFC 7591 dynamic client registration |
+| `GET/POST /authorize` | Consent screen; the customer pastes their connector key |
+| `POST /token` | Authorization code and refresh grants |
+
+The connector key remains the real credential — OAuth just wraps it. The
+customer pastes it once on the consent screen and never touches it again.
+
+Security properties, each covered by a test:
+
+- PKCE **S256 required**; plain and missing challenges are rejected
+- Authorization codes are single-use with a 60-second TTL
+- Redirect URIs must exactly match a registered value, and must be HTTPS or loopback
+- A client/redirect mismatch renders an error page rather than redirecting (no open redirect)
+- Access tokens live 1 hour; refresh tokens rotate on every use
+- Tokens are stored as SHA-256 hashes, and carry their `resource` for audience binding
+- **Revoking a tenant kills its OAuth tokens and blocks refresh** — one revocation covers both auth paths
 
 ## Local development
 
@@ -129,11 +161,14 @@ Claude Desktop / Claude Code stdio config:
 
 ```bash
 npm run build
-SEVENSHIFTS_TOKEN=... node scripts/test-worker.mjs
+SEVENSHIFTS_TOKEN=... node scripts/test-worker.mjs   # 21 checks
+SEVENSHIFTS_TOKEN=... node scripts/test-oauth.mjs    # 28 checks
 ```
 
-Exercises the auth gate, provisioning, MCP protocol, live 7shifts calls, and
-key rotation/revocation against an in-memory KV.
+The first covers the auth gate, provisioning, MCP protocol, live 7shifts calls,
+and key rotation/revocation. The second simulates a full OAuth client —
+discovery, registration, consent, PKCE exchange, refresh rotation, revocation —
+and asserts that direct connector-key auth still works.
 
 ## Writes
 
