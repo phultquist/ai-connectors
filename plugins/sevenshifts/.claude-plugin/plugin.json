@@ -1,7 +1,7 @@
 {
   "name": "sevenshifts",
   "description": "Read-only access to 7shifts scheduling, labor, sales, and payroll data for executive reporting.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "AI Connectors",
     "email": "patrick@particle.ai"
